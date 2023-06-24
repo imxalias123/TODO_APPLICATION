@@ -2,9 +2,10 @@ const express = require("express");
 const path = require("path");
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
+const bcrypt = require("bcrypt");
 const app = express();
 app.use(express.json());
-const dbPath = path.join(__dirname, "todoApplication.db");
+const dbPath = path.join(__dirname, "userData.db");
 
 let db = null;
 const initializeDBandServer = async () => {
@@ -25,14 +26,14 @@ initializeDBandServer();
 
 app.post("/register", async (request, response) => {
   const { username, password, gender, location } = request.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let hashedPassword = await bcrypt.hash(password, 10);
   const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
   if (dbUser === undefined) {
     const createNewQuery = `
       INSERT INTO user (username, password, gender, location)
       VALUES
-      ('${username}','${password}', '${gender}', '${location}');`;
+      ('${username}','${hashedPassword}', '${gender}', '${location}');`;
     if (password.length < 5) {
       response.status(400);
       response.send("Password is too short");
