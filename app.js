@@ -25,7 +25,7 @@ const initializeDBandServer = async () => {
 initializeDBandServer();
 
 app.post("/register", async (request, response) => {
-  const { username, password, gender, location } = request.body;
+  const { username, name, password, gender, location } = request.body;
   let hashedPassword = await bcrypt.hash(password, 10);
   let selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
